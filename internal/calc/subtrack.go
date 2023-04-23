@@ -72,7 +72,6 @@ func spanLength(span span.Span) span.SpanLength {
 
 func subtractWithAll(super span.Span, subtrahends []span.Span, index *int) []span.Span {
 	result := make([]span.Span, 0)
-
 	for ; *index < len(subtrahends); *index++ {
 		l, r := subtractOne(super, subtrahends[*index])
 		if l != nil {
@@ -81,9 +80,14 @@ func subtractWithAll(super span.Span, subtrahends []span.Span, index *int) []spa
 		if r != nil {
 			*index++
 			subResult := subtractWithAll(r, subtrahends, index)
-			result = append(result, subResult...)
+			if len(subResult) == 0 {
+				result = append(result, r)
+			} else {
+				result = append(result, subResult...)
+			}
+			break
 		}
-		if l == nil && r == nil && !mayYetIntersects(super, subtrahends[*index]) {
+		if l != nil || !mayYetIntersects(super, subtrahends[*index]) {
 			break
 		}
 	}

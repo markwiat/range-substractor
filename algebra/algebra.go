@@ -19,11 +19,17 @@ func JoinOverlapped(spans []span.Span) []span.Span {
 	return calc.JoinSorted(sorted)
 }
 
-func SubtractFromSuperSpans(spans []span.CategorizedSpan) span.SpanLength {
+func SubtractAndGet(spans []span.CategorizedSpan) []span.Span {
 	supers, subtrahends := calc.SplitByCategory(spans)
 	supers = JoinOverlapped(supers)
 	subtrahends = JoinOverlapped(subtrahends)
 	subtracted := calc.SubtractOrdered(supers, subtrahends)
+
+	return subtracted
+}
+
+func SubtractFromSuperSpans(spans []span.CategorizedSpan) span.SpanLength {
+	subtracted := SubtractAndGet(spans)
 
 	return calc.SumLengths(subtracted)
 }

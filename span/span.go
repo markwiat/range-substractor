@@ -18,19 +18,3 @@ type CategorizedSpan interface {
 	Span
 	IsSuper() bool
 }
-
-func FilterOutNotPositive(spans []Span) []Span {
-	return nil
-}
-
-func SortByStart(spans []Span) []Span {
-	return nil
-}
-
-func JoinOverlapped(spans []Span) []Span {
-	return nil
-}
-
-func SubtractFromSuperSpans(spans []CategorizedSpan) SpanLength {
-	return nil
-}

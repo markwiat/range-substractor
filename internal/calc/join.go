@@ -17,7 +17,7 @@ func FilterOutNotPositive(spans []span.Span) []span.Span {
 }
 
 func SortPositiveBySpanStart(spans []span.Span) []span.Span {
-	result := make([]span.Span, 0, len(spans))
+	result := make([]span.Span, len(spans))
 	copy(result, spans)
 	sort.Slice(result, func(i, j int) bool {
 		return result[i].Start().Before(result[j].Start())
