@@ -87,7 +87,7 @@ func subtractWithAll(super span.Span, subtrahends []span.Span, index *int) []spa
 			}
 			break
 		}
-		if l != nil || !mayYetIntersects(super, subtrahends[*index]) {
+		if l != nil || !subtrahends[*index].End().Before(super.End()) {
 			break
 		}
 	}
@@ -143,15 +143,6 @@ func findSubtractType(super, subtrahend span.Span) subtractResultType {
 	return empty
 }
 
-func hasPosition(candidate spanPosition, positions []spanPosition) bool {
-	for _, p := range positions {
-		if p == candidate {
-			return true
-		}
-	}
-	return false
-}
-
 func findPosition(span span.Span, corner span.Corner) spanPosition {
 	if corner.Before(span.Start()) {
 		return left
@@ -163,8 +154,4 @@ func findPosition(span span.Span, corner span.Corner) spanPosition {
 		return right
 	}
 	return inside
-}
-
-func mayYetIntersects(super, subtrahend span.Span) bool {
-	return subtrahend.Start().Before(super.End())
 }

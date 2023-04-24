@@ -52,18 +52,6 @@ func equals(a, b span.Corner) bool {
 	return !a.Before(b) && !b.Before(a)
 }
 
-func aBeforeOrEqualsB(a, b span.Corner) bool {
-	return !b.Before(a)
-}
-
-func aAfterB(a, b span.Corner) bool {
-	return b.Before(a)
-}
-
-func aAfterOrEqualsB(a, b span.Corner) bool {
-	return !a.Before(b)
-}
-
 func overlapsOrAdheresSorted(first, second span.Span) bool {
 	return !first.End().Before(second.Start())
 }

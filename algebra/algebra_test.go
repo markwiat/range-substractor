@@ -1,7 +1,6 @@
 package algebra
 
 import (
-	"fmt"
 	"testing"
 
 	"github.com/go-playground/assert/v2"
@@ -49,7 +48,17 @@ func (cts categorizedTestSpan) IsSuper() bool {
 	return cts.super
 }
 
+func newCategorizedSpan(start, end int, super bool) span.CategorizedSpan {
+	return categorizedTestSpan{
+		Span:  testSpan{start: testCorner(start), end: testCorner(end)},
+		super: super,
+	}
+}
+
 func mapToTestSpans(spans []span.Span) []span.Span {
+	if spans == nil {
+		return []span.Span{}
+	}
 	result := make([]span.Span, len(spans))
 	for i, span := range spans {
 		result[i] = testSpan{
@@ -75,32 +84,30 @@ func TestFiltering(t *testing.T) {
 
 func TestSorting(t *testing.T) {
 	a := testSpan{1, 4}
-	b := testSpan{2, 4}
+	b1 := testSpan{2, 4}
 	b2 := testSpan{2, 5}
 	c := testSpan{3, 6}
 	d := testSpan{7, 8}
 
-	expected1 := []span.Span{a, b, b2, c, d}
-	expected2 := []span.Span{a, b2, b, c, d}
+	expected1 := []span.Span{a, b1, b2, c, d}
+	expected2 := []span.Span{a, b2, b1, c, d}
 
 	isExpected := func(result []span.Span) bool {
 		return assert.IsEqual(result, expected1) || assert.IsEqual(result, expected2)
 	}
 
 	inputs := [][]span.Span{
-		{d, c, b2, b, a},
-		{a, c, b2, b, d},
-		{a, b2, b, c, d},
-		{c, b2, d, a, b},
+		{d, c, b2, b1, a},
+		{a, c, b2, b1, d},
+		{a, b2, b1, c, d},
+		{c, b2, d, a, b1},
 	}
 
-	for i, input := range inputs {
-		t.Run(fmt.Sprintf("%d", i), func(t *testing.T) {
-			result := SortByStart(input)
-			if !isExpected(result) {
-				assert.Equal(t, result, true)
-			}
-		})
+	for _, input := range inputs {
+		result := SortByStart(input)
+		if !isExpected(result) {
+			assert.Equal(t, result, true)
+		}
 	}
 }
 
@@ -131,7 +138,7 @@ func TestJoin(t *testing.T) {
 	}
 }
 
-func TestSubtractOrdered(t *testing.T) {
+func TestSubtractSpans(t *testing.T) {
 	type testData struct {
 		super      []span.Span
 		subtrahend []span.Span
@@ -144,6 +151,21 @@ func TestSubtractOrdered(t *testing.T) {
 			subtrahend: []span.Span{testSpan{-1, 2}, testSpan{4, 8}, testSpan{10, 12}, testSpan{19, 22}},
 			expected:   []span.Span{testSpan{-4, -3}, testSpan{2, 4}, testSpan{8, 10}, testSpan{12, 19}, testSpan{22, 25}, testSpan{26, 30}, testSpan{31, 35}},
 		},
+		{
+			super:      []span.Span{testSpan{-4, -3}, testSpan{0, 3}, testSpan{5, 8}, testSpan{10, 15}},
+			subtrahend: []span.Span{testSpan{-2, 14}},
+			expected:   []span.Span{testSpan{-4, -3}, testSpan{14, 15}},
+		},
+		{
+			super:      []span.Span{testSpan{-4, -3}, testSpan{0, 3}, testSpan{5, 8}, testSpan{10, 15}},
+			subtrahend: []span.Span{testSpan{-4, 15}},
+			expected:   []span.Span{},
+		},
+		{
+			super:      []span.Span{testSpan{-4, -3}, testSpan{0, 3}, testSpan{5, 8}, testSpan{10, 15}},
+			subtrahend: []span.Span{testSpan{-5, 16}},
+			expected:   []span.Span{},
+		},
 	}
 
 	for _, test := range tests {
@@ -154,9 +176,74 @@ func TestSubtractOrdered(t *testing.T) {
 		for _, s := range test.subtrahend {
 			spans = append(spans, categorizedTestSpan{s, false})
 		}
-		result := SubtractAndGet(spans)
+		result := FindSubtractedSpans(spans)
 		result = mapToTestSpans(result)
 
 		assert.Equal(t, result, test.expected)
+	}
+}
+
+func TestSubtractLength(t *testing.T) {
+	type testData struct {
+		spans    []span.CategorizedSpan
+		expected int
+	}
+
+	emptyLength := finalResult(0)
+	tests := []testData{
+		{
+			spans: []span.CategorizedSpan{newCategorizedSpan(0, 10, true), newCategorizedSpan(3, 5, false),
+				newCategorizedSpan(3, 5, false), newCategorizedSpan(4, 11, true)},
+			expected: 9,
+		},
+		{
+			spans: []span.CategorizedSpan{newCategorizedSpan(0, 10, true), newCategorizedSpan(3, 5, false),
+				newCategorizedSpan(-1, 11, false), newCategorizedSpan(4, 11, true)},
+			expected: 0,
+		},
+		{
+			spans: []span.CategorizedSpan{newCategorizedSpan(-5, 3, true), newCategorizedSpan(-2, 3, true),
+				newCategorizedSpan(-6, 4, true), newCategorizedSpan(3, 4, false), newCategorizedSpan(4, 8, false),
+				newCategorizedSpan(7, 11, false), newCategorizedSpan(10, 12, true), newCategorizedSpan(14, 15, true)},
+			expected: 11,
+		},
+		{
+			spans: []span.CategorizedSpan{newCategorizedSpan(-2, 3, false), newCategorizedSpan(10, 15, false),
+				newCategorizedSpan(0, 30, true), newCategorizedSpan(4, 6, false), newCategorizedSpan(27, 30, false)},
+			expected: 17,
+		},
+		{
+			spans:    []span.CategorizedSpan{newCategorizedSpan(-2, 3, false), newCategorizedSpan(10, 15, false)},
+			expected: 0,
+		},
+		{
+			spans:    []span.CategorizedSpan{newCategorizedSpan(2, 2, true)},
+			expected: 0,
+		},
+		{
+			spans:    []span.CategorizedSpan{},
+			expected: 0,
+		},
+		{
+			spans:    []span.CategorizedSpan{newCategorizedSpan(2, 3, true), newCategorizedSpan(-5, -1, true)},
+			expected: 5,
+		},
+		{
+			spans: []span.CategorizedSpan{newCategorizedSpan(-2, 6, true), newCategorizedSpan(5, 6, false),
+				newCategorizedSpan(9, 10, false), newCategorizedSpan(12, 14, false)},
+			expected: 7,
+		},
+		{
+			spans: []span.CategorizedSpan{newCategorizedSpan(-2, 6, true), newCategorizedSpan(-6, -2, false),
+				newCategorizedSpan(6, 10, false), newCategorizedSpan(10, 12, true)},
+			expected: 10,
+		},
+	}
+
+	for _, test := range tests {
+		result := SubtractFromSuperSpans(emptyLength, test.spans)
+		r := result.(finalResult)
+		rInt := int(r)
+		assert.Equal(t, rInt, test.expected)
 	}
 }
