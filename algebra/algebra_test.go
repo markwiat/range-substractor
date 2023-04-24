@@ -4,7 +4,7 @@ import (
 	"testing"
 
 	"github.com/go-playground/assert/v2"
-	"github.com/markwiat/range-substractor/span"
+	"github.com/markwiat/range-subtractor/span"
 )
 
 type finalResult int

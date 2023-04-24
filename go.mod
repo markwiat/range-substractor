@@ -1,4 +1,4 @@
-module github.com/markwiat/range-substractor
+module github.com/markwiat/range-subtractor
 
 go 1.18
 

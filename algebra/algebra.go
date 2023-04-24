@@ -1,8 +1,8 @@
 package algebra
 
 import (
-	"github.com/markwiat/range-substractor/internal/calc"
-	"github.com/markwiat/range-substractor/span"
+	"github.com/markwiat/range-subtractor/internal/calc"
+	"github.com/markwiat/range-subtractor/span"
 )
 
 func FilterOutNotPositive(spans []span.Span) []span.Span {

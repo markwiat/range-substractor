@@ -3,7 +3,7 @@ package calc
 import (
 	"sort"
 
-	"github.com/markwiat/range-substractor/span"
+	"github.com/markwiat/range-subtractor/span"
 )
 
 func FilterOutNotPositive(spans []span.Span) []span.Span {

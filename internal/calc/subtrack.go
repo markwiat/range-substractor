@@ -1,6 +1,6 @@
 package calc
 
-import "github.com/markwiat/range-substractor/span"
+import "github.com/markwiat/range-subtractor/span"
 
 func overlaps(super, subtrahend span.Span) bool {
 	return subtrahend.Start().Before(super.End())
