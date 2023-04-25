@@ -9,21 +9,18 @@ import (
 
 type finalResult int
 
-func (ft finalResult) Sum(other span.SpanLength) span.SpanLength {
-	r := ft + other.(finalResult)
-	return r
+func (ft finalResult) Add(other span.SpanLength) span.SpanLength {
+	return ft + other.(finalResult)
 }
 
 type testCorner int64
 
 func (tc testCorner) Sub(other span.Corner) span.SpanLength {
-	otc := other.(testCorner)
-	return finalResult(tc - otc)
+	return finalResult(tc - other.(testCorner))
 }
 
 func (tc testCorner) Before(other span.Corner) bool {
-	otc := other.(testCorner)
-	return tc < otc
+	return tc < other.(testCorner)
 }
 
 type testSpan struct {

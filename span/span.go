@@ -1,7 +1,7 @@
 package span
 
 type SpanLength interface {
-	Sum(other SpanLength) SpanLength
+	Add(other SpanLength) SpanLength
 }
 
 type Corner interface {

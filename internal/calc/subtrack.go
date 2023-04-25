@@ -60,7 +60,7 @@ func SumLengths(spans []span.Span) span.SpanLength {
 	}
 	result := spanLength(spans[0])
 	for i := 1; i < len(spans); i++ {
-		result = result.Sum(spanLength(spans[i]))
+		result = result.Add(spanLength(spans[i]))
 	}
 
 	return result
