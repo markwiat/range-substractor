@@ -101,3 +101,12 @@ func main() {
 	fmt.Printf("Final result: %v\n", duration)
 }
 ```
+
+Above code prints
+
+```text
+Subtracted spans:
+start: 2023-05-01 08:00:00 +0000 UTC, end: 2023-05-01 09:30:00 +0000 UTC
+start: 2023-05-01 10:30:00 +0000 UTC, end: 2023-05-01 14:00:00 +0000 UTC
+Final result: 5h0m0s
+```
