@@ -149,6 +149,31 @@ func TestSubtractSpans(t *testing.T) {
 			expected:   []span.Span{testSpan{-4, -3}, testSpan{2, 4}, testSpan{8, 10}, testSpan{12, 19}, testSpan{22, 25}, testSpan{26, 30}, testSpan{31, 35}},
 		},
 		{
+			super:      []span.Span{testSpan{2, 10}, testSpan{20, 100}},
+			subtrahend: []span.Span{testSpan{0, 1}, testSpan{30, 40}, testSpan{50, 60}},
+			expected:   []span.Span{testSpan{2, 10}, testSpan{20, 30}, testSpan{40, 50}, testSpan{60, 100}},
+		},
+		{
+			super:      []span.Span{testSpan{2, 10}, testSpan{20, 100}},
+			subtrahend: []span.Span{testSpan{0, 1}, testSpan{11, 14}, testSpan{30, 40}, testSpan{50, 60}},
+			expected:   []span.Span{testSpan{2, 10}, testSpan{20, 30}, testSpan{40, 50}, testSpan{60, 100}},
+		},
+		{
+			super:      []span.Span{testSpan{2, 10}, testSpan{20, 100}, testSpan{300, 400}},
+			subtrahend: []span.Span{testSpan{0, 1}, testSpan{11, 14}, testSpan{15, 18}, testSpan{30, 40}, testSpan{50, 60}, testSpan{150, 160}, testSpan{170, 180}, testSpan{280, 320}},
+			expected:   []span.Span{testSpan{2, 10}, testSpan{20, 30}, testSpan{40, 50}, testSpan{60, 100}, testSpan{320, 400}},
+		},
+		{
+			super:      []span.Span{testSpan{2, 10}, testSpan{20, 100}},
+			subtrahend: []span.Span{testSpan{0, 1}, testSpan{-5, -2}},
+			expected:   []span.Span{testSpan{2, 10}, testSpan{20, 100}},
+		},
+		{
+			super:      []span.Span{testSpan{2, 10}, testSpan{20, 100}},
+			subtrahend: []span.Span{testSpan{121, 125}, testSpan{150, 160}},
+			expected:   []span.Span{testSpan{2, 10}, testSpan{20, 100}},
+		},
+		{
 			super:      []span.Span{testSpan{-4, -3}, testSpan{0, 3}, testSpan{5, 8}, testSpan{10, 15}},
 			subtrahend: []span.Span{testSpan{-2, 14}},
 			expected:   []span.Span{testSpan{-4, -3}, testSpan{14, 15}},

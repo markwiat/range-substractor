@@ -72,6 +72,11 @@ func spanLength(span span.Span) span.SpanLength {
 
 func subtractWithAll(super span.Span, subtrahends []span.Span, index *int) []span.Span {
 	result := make([]span.Span, 0)
+	for ; *index < len(subtrahends)-1; *index++ {
+		if super.Start().Before(subtrahends[*index].End()) {
+			break
+		}
+	}
 	for ; *index < len(subtrahends); *index++ {
 		l, r := subtractOne(super, subtrahends[*index])
 		if l != nil {
